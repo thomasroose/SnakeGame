@@ -1,72 +1,134 @@
 package snake;
 
-import java.awt.Dimension;
+import java.awt.Color;
 import java.awt.Point;
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.LinkedList;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.util.Random;
 
+import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.Timer;
+import javax.swing.JPanel;
 
-
-//http://docs.oracle.com/javase/tutorial/uiswing/components/frame.html
-//http://www.programcreek.com/java-api-examples/java.awt.Dimension
-
-
-//arraylist
-
-public class Snake implements ActionListener {
+public class Snake extends JFrame implements KeyListener, Runnable{
 	
-	public JFrame frame;
-	public Panel panel;
-	public static Snake snake;
-	public Timer timer = new Timer(20, this);
+	private JPanel p = new JPanel();
 	
-	public LinkedList<Point> snakeParts = new LinkedList<Point>();
+	private final int WIDTH = 300;
+	private final int HEIGHT = 300;
 	
-	public static final int UP = 0, DOWN = 1, LEFT = 2, RIGHT = 3;
+	//Snake properties
+	private JButton [] lb = new JButton[200];
+	private int x = 500, y = 250;
+	private int gu = 3;
+	private int directionX = 1, directionY = 0, oldX, oldY;
 	
-	public int ticks = 0, direction = DOWN, score;
+	//Snake coordinates
+	private int[] snake_X = new int[300];
+	private int[] snake_Y = new int[300];
 	
-	public Point head,apple;
+	//Snake movoments
+	private boolean move_left = false;
+	private boolean move_right = false;
+	private boolean move_up = false;
+	private boolean move_down = false;
 	
+	private Point[] snake_Point = new Point[300];
 	
-	public Snake() {
-		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-		frame = new JFrame("Snake");
-		frame.setVisible(true);
-		frame.setSize(750,650);
-		frame.setLocation(dim.width / 2 - frame.getWidth()/2, dim.height / 2 - frame.getHeight()/2);
-		frame.add(panel = new Panel());
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		head = new Point(0,0);
-		timer.start();
+	//Start thread
+	Thread thread;
+	Random r = new Random();
+	
+	public Snake(){
+		super("Snake");
+		
+		setSize(WIDTH,HEIGHT);
+		setLocationRelativeTo(null);
+		setResizable(false);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		
+		starting_Snake();
+		
+		p.setLayout(null);
+		p.setBackground(Color.BLACK);
+		
+		add(p);
+		
+		show();
+		
+		initializeValues();
+		addKeyListener(this);
+		
+		thread = new Thread(this);
+		thread.start();
 	}
 	
-	@Override
-	public void actionPerformed(ActionEvent arg0){
-		panel.repaint();
-		ticks++;
+	public void initializeValues(){
+		gu = 3;
+		snake_X[0] = 100;
+		snake_Y[0] = 150;
+		directionX = 10;
+		directionY = 0;
 		
-		if(ticks % 10 == 0 && head != null){
-			if(direction == UP)
-				snakeParts.add(new Point(head.x, head.y - 1));
-			if(direction == DOWN)
-				snakeParts.add(new Point(head.x, head.y + 1));
-			if(direction == LEFT)
-				snakeParts.add(new Point(head.x - 1, head.y));
-			if(direction == RIGHT)
-				snakeParts.add(new Point(head.x + 1, head.y));
-			if(apple != null){
-				
-			}
+		move_left = false;
+		move_right = true;
+		move_up = true;
+		move_down = true;
+	}
+	
+	public void starting_Snake(){
+		for(int i = 0; i < gu; i++){
+			lb[i] = new JButton("lb" + i);
+			lb[i].setEnabled(false);
+			p.add(lb[i]);
+			
+			lb[i].setBounds(snake_X[i], snake_Y[i], 10, 10);
+			snake_X[i+1] = snake_X[i] = snake_X[i] - 10;
+			snake_Y[i+1] = snake_Y[i];
 		}
+	}
+	
+	public void reset(){
+		initializeValues();
+		p.removeAll();
+		
+		thread.stop();
+		
+		starting_Snake();
+		thread = new Thread(this);
+		thread.start();
+	}
+	
+	//Snake gets larger as he eats
+	public void grow(){
+		lb[gu] = new JButton();
+		lb[gu].setEnabled(false);
+		
+		p.add(lb[gu]);
+		
+		int x = 10 + (10 * r.nextInt(48));
+		int y = 10 + (10 * r.nextInt(23));
+		
+		snake_X[gu] = x;
+		snake_Y[gu] = y;
+		lb[gu].setBounds(x,y,10,10);
+		gu++;
+	}
+	
+	public void run(){
 		
 	}
 	
-	public static void main(String[] args){
-		snake = new Snake();
+	public void keyTyped(KeyEvent e){
+		
 	}
+	
+	public void keyPressed(KeyEvent e){
+		
+	}
+	
+	public void keyReleased(KeyEvent e){
+		
+	}
+	
 }
