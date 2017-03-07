@@ -12,22 +12,30 @@ import javax.swing.JPanel;
 
 public class Snake extends JFrame implements KeyListener, Runnable{
 	
+	/**
+	 * Panel properties
+	 */
 	private JPanel p = new JPanel();
-	
 	private final int WIDTH = 300;
 	private final int HEIGHT = 300;
 	
-	//Snake properties
+	/**
+	 * Snake properties
+	 */
 	private JButton [] sb = new JButton[200];
 	private int x = 500, y = 250;
 	private int su = 3;
 	private int directionX = 1, directionY = 0, oldX, oldY;
 	
-	//Snake coordinates
+	/**
+	 * Snake coordinates
+	 */
 	private int[] snake_X = new int[300];
 	private int[] snake_Y = new int[300];
 	
-	//Snake movoments
+	/**
+	 * Snake movements
+	 */
 	private boolean move_left = false;
 	private boolean move_right = false;
 	private boolean move_up = false;
@@ -37,10 +45,19 @@ public class Snake extends JFrame implements KeyListener, Runnable{
 	private boolean food = false;
 	private int score = 0;
 	
-	//Start thread
+	/**
+	 * Start the thread
+	 */
 	Thread thread;
+	
+	/**
+	 * Creation of a new random
+	 */
 	Random r = new Random();
 	
+	/**
+	 * Class snake
+	 */
 	public Snake(){
 		super("Snake");
 		
@@ -65,6 +82,9 @@ public class Snake extends JFrame implements KeyListener, Runnable{
 		thread.start();
 	}
 	
+	/**
+	 * Initialize the values for the game
+	 */
 	public void initializeValues(){
 		su = 3;
 		
@@ -82,6 +102,9 @@ public class Snake extends JFrame implements KeyListener, Runnable{
 		move_down = true;
 	}
 	
+	/**
+	 * The start of the game
+	 */
 	public void starting_Snake(){
 		for(int i = 0; i < su; i++){
 			sb[i] = new JButton("sb" + i);
@@ -94,6 +117,9 @@ public class Snake extends JFrame implements KeyListener, Runnable{
 		}
 	}
 	
+	/**
+	 * Resetting of the game
+	 */
 	public void reset(){
 		initializeValues();
 		p.removeAll();
@@ -105,7 +131,9 @@ public class Snake extends JFrame implements KeyListener, Runnable{
 		thread.start();
 	}
 	
-	//Snake gets larger as he eats
+	/**
+	 * Snake gets bigger as he eats
+	 */
 	public void grow(){
 		sb[su] = new JButton();
 		sb[su].setEnabled(false);
@@ -121,13 +149,17 @@ public class Snake extends JFrame implements KeyListener, Runnable{
 		su++;
 	}
 	
-	//Move snake forward
+	/**
+	 * Move the snake forward
+	 */
 	public void move(){
 		for(int i = 0; i < su; i++){
 			snake_Point[i] = sb[i].getLocation();
 		}
 		
-		//Move the head of the snake
+		/**
+		 * Move the head of the snake
+		 */
 		snake_X[0] += directionX;
 		snake_Y[0] += directionY;
 		sb[0].setBounds(snake_X[0], snake_Y[0], 10, 10);
@@ -136,7 +168,9 @@ public class Snake extends JFrame implements KeyListener, Runnable{
 			sb[i].setLocation(snake_Point[i-1]);
 		}
 		
-		//Logic for Snake Movements
+		/**
+		 * Logic for snake movements
+		 */
 		if(snake_X[0] == x){
 			snake_X[0] = 10;
 		}else if(snake_X[0] == 0){
@@ -158,7 +192,7 @@ public class Snake extends JFrame implements KeyListener, Runnable{
 		} else{
 			sb[su -1].setBounds(snake_X[su - 1], snake_Y[su -1], 10, 10);
 		}
-		//3.22
+		
 		
 	}
 	
