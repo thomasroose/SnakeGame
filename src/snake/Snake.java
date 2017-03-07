@@ -18,9 +18,9 @@ public class Snake extends JFrame implements KeyListener, Runnable{
 	private final int HEIGHT = 300;
 	
 	//Snake properties
-	private JButton [] lb = new JButton[200];
+	private JButton [] sb = new JButton[200];
 	private int x = 500, y = 250;
-	private int gu = 3;
+	private int su = 3;
 	private int directionX = 1, directionY = 0, oldX, oldY;
 	
 	//Snake coordinates
@@ -34,6 +34,8 @@ public class Snake extends JFrame implements KeyListener, Runnable{
 	private boolean move_down = false;
 	
 	private Point[] snake_Point = new Point[300];
+	private boolean food = false;
+	private int score = 0;
 	
 	//Start thread
 	Thread thread;
@@ -64,11 +66,15 @@ public class Snake extends JFrame implements KeyListener, Runnable{
 	}
 	
 	public void initializeValues(){
-		gu = 3;
+		su = 3;
+		
 		snake_X[0] = 100;
 		snake_Y[0] = 150;
 		directionX = 10;
 		directionY = 0;
+		
+		food = false;
+		score = 0;
 		
 		move_left = false;
 		move_right = true;
@@ -77,12 +83,12 @@ public class Snake extends JFrame implements KeyListener, Runnable{
 	}
 	
 	public void starting_Snake(){
-		for(int i = 0; i < gu; i++){
-			lb[i] = new JButton("lb" + i);
-			lb[i].setEnabled(false);
-			p.add(lb[i]);
+		for(int i = 0; i < su; i++){
+			sb[i] = new JButton("sb" + i);
+			sb[i].setEnabled(false);
+			p.add(sb[i]);
 			
-			lb[i].setBounds(snake_X[i], snake_Y[i], 10, 10);
+			sb[i].setBounds(snake_X[i], snake_Y[i], 10, 10);
 			snake_X[i+1] = snake_X[i] = snake_X[i] - 10;
 			snake_Y[i+1] = snake_Y[i];
 		}
@@ -101,18 +107,59 @@ public class Snake extends JFrame implements KeyListener, Runnable{
 	
 	//Snake gets larger as he eats
 	public void grow(){
-		lb[gu] = new JButton();
-		lb[gu].setEnabled(false);
+		sb[su] = new JButton();
+		sb[su].setEnabled(false);
 		
-		p.add(lb[gu]);
+		p.add(sb[su]);
 		
 		int x = 10 + (10 * r.nextInt(48));
 		int y = 10 + (10 * r.nextInt(23));
 		
-		snake_X[gu] = x;
-		snake_Y[gu] = y;
-		lb[gu].setBounds(x,y,10,10);
-		gu++;
+		snake_X[su] = x;
+		snake_Y[su] = y;
+		sb[su].setBounds(x,y,10,10);
+		su++;
+	}
+	
+	//Move snake forward
+	public void move(){
+		for(int i = 0; i < su; i++){
+			snake_Point[i] = sb[i].getLocation();
+		}
+		
+		//Move the head of the snake
+		snake_X[0] += directionX;
+		snake_Y[0] += directionY;
+		sb[0].setBounds(snake_X[0], snake_Y[0], 10, 10);
+		
+		for(int i = 0; i < su; i++){
+			sb[i].setLocation(snake_Point[i-1]);
+		}
+		
+		//Logic for Snake Movements
+		if(snake_X[0] == x){
+			snake_X[0] = 10;
+		}else if(snake_X[0] == 0){
+			snake_X[0] = x - 10;
+		}else if(snake_Y[0] == y){
+			snake_Y[0] = 10;
+		}else if(snake_Y[0] == 0){
+			snake_Y[0] = y - 10;
+		}
+		
+		if(snake_X[0] == snake_X[su - 1] && snake_Y[0] == snake_Y[su - 1]){
+			food = false;
+			score ++;
+		}
+		
+		if(food == false){
+			grow();
+			food = true;
+		} else{
+			sb[su -1].setBounds(snake_X[su - 1], snake_Y[su -1], 10, 10);
+		}
+		//3.22
+		
 	}
 	
 	public void run(){
