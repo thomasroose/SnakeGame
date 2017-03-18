@@ -16,16 +16,17 @@ public class Snake extends JFrame implements KeyListener, Runnable{
 	 * Panel properties
 	 */
 	private JPanel p = new JPanel();
-	private final int WIDTH = 300;
-	private final int HEIGHT = 300;
+	private final int WIDTH = 500;
+	private final int HEIGHT = 500;
 	
 	/**
 	 * Snake properties
 	 */
-	private JButton [] sb = new JButton[200];
-	private int x = 500, y = 250;
+	private JButton [] snakebody = new JButton[200];
+	private int x = 500, y = 500;
 	private int su = 3;
 	private int directionX = 1, directionY = 0, oldX, oldY;
+	private final int speed = 100;
 	
 	/**
 	 * Snake coordinates
@@ -44,6 +45,8 @@ public class Snake extends JFrame implements KeyListener, Runnable{
 	private Point[] snake_Point = new Point[300];
 	private boolean food = false;
 	private int score = 0;
+	private boolean gameover = false;
+	double xcoordinatehead,ycoordinatehead, xcoordinatebody, ycoordinatebody;
 	
 	/**
 	 * Start the thread
@@ -107,11 +110,11 @@ public class Snake extends JFrame implements KeyListener, Runnable{
 	 */
 	public void starting_Snake(){
 		for(int i = 0; i < su; i++){
-			sb[i] = new JButton("sb" + i);
-			sb[i].setEnabled(false);
-			p.add(sb[i]);
+			snakebody[i] = new JButton("sb" + i);
+			snakebody[i].setEnabled(false);
+			p.add(snakebody[i]);
 			
-			sb[i].setBounds(snake_X[i], snake_Y[i], 10, 10);
+			snakebody[i].setBounds(snake_X[i], snake_Y[i], 10, 10);
 			snake_X[i+1] = snake_X[i] = snake_X[i] - 10;
 			snake_Y[i+1] = snake_Y[i];
 		}
@@ -135,26 +138,27 @@ public class Snake extends JFrame implements KeyListener, Runnable{
 	 * Snake gets bigger as he eats
 	 */
 	public void grow(){
-		sb[su] = new JButton();
-		sb[su].setEnabled(false);
+		snakebody[su] = new JButton();
+		snakebody[su].setEnabled(false);
 		
-		p.add(sb[su]);
+		p.add(snakebody[su]);
 		
-		int x = 10 + (10 * r.nextInt(48));
-		int y = 10 + (10 * r.nextInt(23));
+		int x = 10 + (10 * r.nextInt(44));
+		int y = 10 + (10 * r.nextInt(44));
 		
 		snake_X[su] = x;
 		snake_Y[su] = y;
-		sb[su].setBounds(x,y,10,10);
+		snakebody[su].setBounds(x,y,10,10);
 		su++;
 	}
 	
 	/**
-	 * Move the snake forward
+	 * Move the snake 
 	 */
 	public void move(){
+		
 		for(int i = 0; i < su; i++){
-			snake_Point[i] = sb[i].getLocation();
+			snake_Point[i] = snakebody[i].getLocation();
 		}
 		
 		/**
@@ -162,10 +166,10 @@ public class Snake extends JFrame implements KeyListener, Runnable{
 		 */
 		snake_X[0] += directionX;
 		snake_Y[0] += directionY;
-		sb[0].setBounds(snake_X[0], snake_Y[0], 10, 10);
+		snakebody[0].setBounds(snake_X[0], snake_Y[0], 10, 10);
 		
-		for(int i = 0; i < su; i++){
-			sb[i].setLocation(snake_Point[i-1]);
+		for(int i = 1; i < su; i++){
+			snakebody[i].setLocation(snake_Point[i-1]);
 		}
 		
 		/**
@@ -181,33 +185,122 @@ public class Snake extends JFrame implements KeyListener, Runnable{
 			snake_Y[0] = y - 10;
 		}
 		
+		/**
+		 * Increase score when snake eats food
+		 */
 		if(snake_X[0] == snake_X[su - 1] && snake_Y[0] == snake_Y[su - 1]){
 			food = false;
-			score ++;
+			score += 5;
+			System.out.println("Score: " + score);
 		}
 		
+		/**
+		 * Generate new food when food is false
+		 */
 		if(food == false){
 			grow();
 			food = true;
 		} else{
-			sb[su -1].setBounds(snake_X[su - 1], snake_Y[su -1], 10, 10);
+			snakebody[su -1].setBounds(snake_X[su - 1], snake_Y[su -1], 10, 10);
+		}	
+		
+		for(int i = 1; i < su-1; i++){
+			xcoordinatehead = snake_Point[0].getX();
+			ycoordinatehead = snake_Point[0].getY();
+			
+			xcoordinatebody = snake_Point[i].getX();
+			ycoordinatebody = snake_Point[i].getY(); 
+			
+			if(xcoordinatehead == xcoordinatebody && ycoordinatehead == ycoordinatebody){
+				System.out.println("Game over! Your score is: " + score);
+				try{
+					thread.join();
+				}catch(Exception e){
+					
+				}
+				break;
+			}
 		}
 		
-		
+		p.repaint();
+		show();
 	}
-	
+
+	@Override
 	public void run(){
-		
+		/**
+		 * Starts the game by moving the snake to the right
+		 */
+		while(!gameover){
+			
+			move();
+			
+			try {
+				Thread.sleep(speed);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 	
+	@Override
 	public void keyTyped(KeyEvent e){
 		
 	}
 	
+	/**
+	 * Moves the snake to the direction of the arrow key that the user pressed
+	 */
+	@Override
 	public void keyPressed(KeyEvent e){
+		
+		/**
+		 * Change direction to LEFT
+		 */
+		if(move_left == true && e.getKeyCode() == 37){
+			directionX = -10;
+			directionY = 0;
+			move_right = false;
+			move_up = true;
+			move_down = true;
+		}
+		
+		/**
+		 * Change direction to UP
+		 */
+		if(move_up == true && e.getKeyCode() == 38){
+			directionX = 0;
+			directionY = -10;
+			move_down = false;
+			move_left = true;
+			move_right = true;
+		}
+		
+		/**
+		 * Change direction to RIGHT
+		 */
+		if(move_right == true && e.getKeyCode() == 39){
+			directionX = 10;
+			directionY = 0;
+			move_left = false;
+			move_up = true;
+			move_down = true;
+		}
+		
+		/**
+		 * Change direction to DOWN
+		 */
+		if(move_down == true && e.getKeyCode() == 40){
+			directionX = 0;
+			directionY = 10;
+			move_up = false;
+			move_left = true;
+			move_right = true;
+		}
 		
 	}
 	
+	@Override
 	public void keyReleased(KeyEvent e){
 		
 	}
