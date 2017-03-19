@@ -23,7 +23,7 @@ public class Snake extends JFrame implements KeyListener, Runnable{
 	/**
 	 * Snake properties
 	 */
-	private JButton [] snakebody = new JButton[200];
+	private JButton [] snakebody = new JButton[300];
 	private int x = 500, y = 500;
 	private int su = 3;
 	private int directionX = 1, directionY = 0;
