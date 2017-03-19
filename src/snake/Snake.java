@@ -10,6 +10,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+@SuppressWarnings("serial")
 public class Snake extends JFrame implements KeyListener, Runnable{
 	
 	/**
@@ -25,7 +26,7 @@ public class Snake extends JFrame implements KeyListener, Runnable{
 	private JButton [] snakebody = new JButton[200];
 	private int x = 500, y = 500;
 	private int su = 3;
-	private int directionX = 1, directionY = 0, oldX, oldY;
+	private int directionX = 1, directionY = 0;
 	private final int speed = 100;
 	
 	/**
@@ -61,6 +62,7 @@ public class Snake extends JFrame implements KeyListener, Runnable{
 	/**
 	 * Class snake
 	 */
+	@SuppressWarnings("deprecation")
 	public Snake(){
 		super("Snake");
 		
@@ -103,6 +105,8 @@ public class Snake extends JFrame implements KeyListener, Runnable{
 		move_right = true;
 		move_up = true;
 		move_down = true;
+		
+		gameover = false;
 	}
 	
 	/**
@@ -118,20 +122,6 @@ public class Snake extends JFrame implements KeyListener, Runnable{
 			snake_X[i+1] = snake_X[i] = snake_X[i] - 10;
 			snake_Y[i+1] = snake_Y[i];
 		}
-	}
-	
-	/**
-	 * Resetting of the game
-	 */
-	public void reset(){
-		initializeValues();
-		p.removeAll();
-		
-		thread.stop();
-		
-		starting_Snake();
-		thread = new Thread(this);
-		thread.start();
 	}
 	
 	/**
@@ -204,6 +194,9 @@ public class Snake extends JFrame implements KeyListener, Runnable{
 			snakebody[su -1].setBounds(snake_X[su - 1], snake_Y[su -1], 10, 10);
 		}	
 		
+		/**
+		 * Logic for when the snake hits itself ( =gameover)
+		 */
 		for(int i = 1; i < su-1; i++){
 			xcoordinatehead = snake_Point[0].getX();
 			ycoordinatehead = snake_Point[0].getY();
@@ -212,25 +205,24 @@ public class Snake extends JFrame implements KeyListener, Runnable{
 			ycoordinatebody = snake_Point[i].getY(); 
 			
 			if(xcoordinatehead == xcoordinatebody && ycoordinatehead == ycoordinatebody){
+				gameover = true;
 				System.out.println("Game over! Your score is: " + score);
 				try{
 					thread.join();
 				}catch(Exception e){
 					
 				}
-				break;
+				break;	
 			}
 		}
-		
 		p.repaint();
-		show();
 	}
 
 	@Override
 	public void run(){
 		/**
 		 * Starts the game by moving the snake to the right
-		 */
+		 */	
 		while(!gameover){
 			
 			move();
@@ -241,11 +233,6 @@ public class Snake extends JFrame implements KeyListener, Runnable{
 				e.printStackTrace();
 			}
 		}
-	}
-	
-	@Override
-	public void keyTyped(KeyEvent e){
-		
 	}
 	
 	/**
@@ -296,13 +283,18 @@ public class Snake extends JFrame implements KeyListener, Runnable{
 			move_up = false;
 			move_left = true;
 			move_right = true;
-		}
-		
+		}	
 	}
-	
+
 	@Override
-	public void keyReleased(KeyEvent e){
+	public void keyReleased(KeyEvent arg0) {
+		// TODO Auto-generated method stub
 		
 	}
-	
+
+	@Override
+	public void keyTyped(KeyEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
 }
